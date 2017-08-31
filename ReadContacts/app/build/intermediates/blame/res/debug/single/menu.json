@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "C:\\tools\\ReadContacts\\app\\build\\intermediates\\res\\merged\\debug\\menu\\main.xml",
+        "source": "C:\\tools\\ReadContacts\\app\\src\\main\\res\\menu\\main.xml"
+    },
+    {
+        "merged": "C:\\tools\\droid\\ReadContacts\\app\\build\\intermediates\\res\\merged\\debug\\menu\\main.xml",
+        "source": "C:\\tools\\droid\\ReadContacts\\app\\src\\main\\res\\menu\\main.xml"
+    }
+]
