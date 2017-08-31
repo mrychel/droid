@@ -187,7 +187,7 @@ public class MainActivity extends Activity {
 		}
 
 		final File file = new File(path, "mrychel.txt");
-buf.append(file.getAbsolutePath());
+  buf.append(file.getAbsolutePath());
 		// Save your stream, don't forget to flush() it before closing it.
 
 		try
