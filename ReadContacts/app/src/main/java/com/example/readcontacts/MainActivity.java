@@ -1,15 +1,21 @@
 package com.example.readcontacts;
 
+import java.io.BufferedWriter;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Intents;
+import android.content.ContentProviderOperation;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,17 +50,22 @@ public class MainActivity extends Activity {
 
 		mListView = (ListView) findViewById(R.id.list);
 		updateBarHandler =new Handler();
-		
+		setContacts();
+		//getContacts();
 		// Since reading contacts takes more time, let's run it on a separate thread.
+		/*
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
+
 				getContacts();
+
 			}
 		}).start();
-
+*/
 		// Set onclicklistener to the list item.
+		/*
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -63,11 +74,99 @@ public class MainActivity extends Activity {
 				//TODO Do whatever you want with the list data
 				Toast.makeText(getApplicationContext(), "item clicked : \n"+contactList.get(position), Toast.LENGTH_SHORT).show();
 			}
-		});
+		});*/
 	}
 
-	public void getContacts() {
+	public void setContacts() {
+        boolean a;
+ /*       a = insertContact("Mama", "505171199");
+        a = insertContact("Tato", "518115548");
+        a = insertContact("Agnieszka", "507160801");
+        a = insertContact("Kajtek", "722188616");
+        a = insertContact("Gabi", "661907177");
+        a = insertContact("Mama Agnieszki", "507727781");
+        a = insertContact("Babcia", "502587033");
 
+        a = insertContact("Dorota", "507488224");
+        a = insertContact("Michał", "518115548");
+        a = insertContact("Stasiek", "785007034");
+        a = insertContact("Asia", "515631963");
+        a = insertContact("Atena", "502183126");
+        a = insertContact("Łukasz", "881786888");
+*/
+        a = insertContact("Stefan", "601897446");
+        a = insertContact("Ania Paszczuk", "511393479");
+
+        a = insertContact("Marek", "604576933");
+        a = insertContact("Rysiek", "604233036");
+        a = insertContact("Piotrek", "665929266");
+        a = insertContact("Paweł", "790404041");
+        a = insertContact("Jacek", "693417730");
+        a = insertContact("Jasiek", "500471123");
+
+        a = insertContact("Roman", "667671116");
+        a = insertContact("Bożena Tarczydło", "509393935");
+
+        a = insertContact("Michał Lubaś", "668030646");
+        a = insertContact("Piotr Pawlak", "691633163");
+        a = insertContact("Grzegorz Sudolski", "607298056");
+        a = insertContact("Krzysiek Glaesmann", "500054935");
+        a = insertContact("Łukasz Truba", "698835825");
+        a = insertContact("Krzysztof Juzaszek", "799609912");
+
+/*
+
+		for (int i = 0; i < 3; i++) {
+			Intent intent = new Intent(Intents.Insert.ACTION);
+			intent.setType(ContactsContract.RawContacts.CONTENT_TYPE);
+			intent
+					.putExtra(Intents.Insert.NAME, "Zdzichu"+i)
+					.putExtra(Intents.Insert.EMAIL, "mrychel@wwww.com")
+					.putExtra(Intents.Insert.PHONE, "507231112");
+			startActivity(intent);
+		}*/
+	}
+
+    public boolean insertContact(String firstName, String mobileNumber) {
+        ContentResolver contentResolver = getContentResolver();
+        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+        ops.add(ContentProviderOperation
+                .newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+                .build());
+        ops.add(ContentProviderOperation
+                .newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                .withValue(
+                        ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                .withValue(
+                        ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
+                        firstName).build());
+        ops.add(ContentProviderOperation
+                .newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                .withValue(
+                        ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER,
+                        mobileNumber)
+                .withValue(ContactsContract.CommonDataKinds.Phone.TYPE,
+                        Phone.TYPE_MOBILE).build());
+
+        try {
+            contentResolver.applyBatch(ContactsContract.AUTHORITY, ops);
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
+            return false;
+        }
+        Toast.makeText(getApplicationContext(), firstName, Toast.LENGTH_SHORT).show();
+        return true;
+    }
+
+
+    public void getContacts() {
 
 		contactList = new ArrayList<String>();
 
@@ -87,8 +186,7 @@ public class MainActivity extends Activity {
 		String EmailCONTACT_ID = ContactsContract.CommonDataKinds.Email.CONTACT_ID;
 		String DATA = ContactsContract.CommonDataKinds.Email.DATA;
 
-		StringBuffer output;
-        String s = new String("\n");
+		StringBuffer output = new StringBuffer();
 		ContentResolver contentResolver = getContentResolver();
 
 		cursor = contentResolver.query(CONTENT_URI, null,null, null, null);	
@@ -99,7 +197,6 @@ public class MainActivity extends Activity {
 			counter = 0;
 
 			while (cursor.moveToNext()) {
-				output = new StringBuffer();
 
 				// Update the progress message
 				updateBarHandler.post(new Runnable() {
@@ -110,20 +207,19 @@ public class MainActivity extends Activity {
 
 				String contact_id = cursor.getString(cursor.getColumnIndex( _ID ));
 				String name = cursor.getString(cursor.getColumnIndex( DISPLAY_NAME ));
+                //Toast.makeText(getApplicationContext(), cursor.getString(cursor.getColumnIndex( ContactsContract.RawContacts.ACCOUNT_TYPE )), Toast.LENGTH_LONG).show();
 
 				int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex( HAS_PHONE_NUMBER )));
 
 				if (hasPhoneNumber > 0) {
 
 					output.append("\n Numer:"+contact_id+" First Name:" + name);
-					s.concat("\n Numer:"+contact_id+" First Name:" + name);
 					//This is to read multiple phone numbers associated with the same contact
 					Cursor phoneCursor = contentResolver.query(PhoneCONTENT_URI, null, Phone_CONTACT_ID + " = ?", new String[] { contact_id }, null);
 
 					while (phoneCursor.moveToNext()) {
 						phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(NUMBER));
 						output.append("\n Phone number:" + phoneNumber);
-						s.concat("\n Phone number:" + phoneNumber);
 					}
 
 					phoneCursor.close();
@@ -136,7 +232,6 @@ public class MainActivity extends Activity {
 						email = emailCursor.getString(emailCursor.getColumnIndex(DATA));
 
 						output.append("\n Email:" + email);
-						s.concat("\n Email:" + email);
 					}
 
 					emailCursor.close();
@@ -165,13 +260,20 @@ public class MainActivity extends Activity {
 				}
 			}, 500);
 		}
-        writeToFile(s);
+		/*
+		String[] mm = cursor.getColumnNames();
+
+		for (int kk = 0; kk < mm.length; kk++) {
+		//writeToFile(mm[kk].toString());}
+            Toast.makeText(getApplicationContext(), mm[kk], Toast.LENGTH_LONG).show();}*/
 	}
 
 	public void writeToFile(String data)
 	{
-		StringBuffer buf = new StringBuffer();
-        // Get the directory for the user's public pictures directory.
+		// Get the directory for the user's public pictures directory.
+		//pDialog.setMessage("Siemka Lamusie");
+
+
 		final File path =
 				Environment.getExternalStoragePublicDirectory
 						(
@@ -187,7 +289,7 @@ public class MainActivity extends Activity {
 		}
 
 		final File file = new File(path, "mrychel.txt");
-  buf.append(file.getAbsolutePath());
+		//buf.append(file.getAbsolutePath());
 		// Save your stream, don't forget to flush() it before closing it.
 
 		try
@@ -195,9 +297,12 @@ public class MainActivity extends Activity {
 
 			file.createNewFile();
 			FileOutputStream fOut = new FileOutputStream(file);
-			OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-			myOutWriter.append(data);
+			OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut, "utf-8");
 
+			Toast.makeText(getApplicationContext(), "przed", Toast.LENGTH_LONG).show();
+			myOutWriter.append(data);//append("mm".toCharArray());
+			Toast.makeText(getApplicationContext(), "po", Toast.LENGTH_LONG).show();
+			myOutWriter.flush();
 			myOutWriter.close();
 
 			fOut.flush();
@@ -206,6 +311,7 @@ public class MainActivity extends Activity {
 		catch (IOException e)
 		{
 			Log.e("Exception", "File write failed: " + e.toString());
+			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
 		}
 	}
 
